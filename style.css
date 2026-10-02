@@ -475,3 +475,162 @@ button {
     font-size: 42px;
   }
 }
+/* PRICING PAGE */
+
+.pricing-page {
+  max-width: 1200px;
+  margin: auto;
+  padding: 90px 6%;
+}
+
+.pricing-intro {
+  text-align: center;
+  max-width: 700px;
+  margin: 0 auto 55px;
+}
+
+.pricing-intro h1 {
+  font-size: clamp(42px, 6vw, 70px);
+  line-height: 1;
+  letter-spacing: -3px;
+  margin-bottom: 20px;
+}
+
+.pricing-intro > p:last-child {
+  color: var(--muted);
+  font-size: 17px;
+}
+
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 420px));
+  justify-content: center;
+  gap: 22px;
+}
+
+.pricing-card {
+  position: relative;
+  padding: 35px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.pricing-card.featured-plan {
+  border-color: var(--red);
+}
+
+.pricing-card-top {
+  text-align: center;
+}
+
+.plan-name {
+  color: var(--red-light);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.pricing-card h2 {
+  font-size: 58px;
+  line-height: 1;
+  margin: 15px 0 5px;
+}
+
+.pricing-card-top p {
+  color: var(--muted);
+}
+
+.plan-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 28px 0;
+}
+
+.pricing-card ul {
+  list-style: none;
+  display: grid;
+  gap: 14px;
+  color: #d9d2d5;
+  margin-bottom: 30px;
+}
+
+.pricing-button {
+  width: 100%;
+}
+
+.best-value {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: var(--red);
+  color: white;
+  font-size: 9px;
+  font-weight: 800;
+  padding: 6px 9px;
+  border-radius: 4px;
+}
+
+.pricing-message {
+  max-width: 850px;
+  margin: 70px auto 35px;
+  padding: 45px;
+  text-align: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.message-icon {
+  width: 42px;
+  height: 42px;
+  margin: 0 auto 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--red);
+  font-size: 24px;
+}
+
+.pricing-message h2 {
+  font-size: 30px;
+  margin-bottom: 12px;
+}
+
+.pricing-message p {
+  color: var(--muted);
+}
+
+.pricing-note {
+  max-width: 650px;
+  margin: auto;
+  text-align: center;
+  color: var(--muted);
+}
+
+.pricing-note strong {
+  display: block;
+  color: white;
+  margin-bottom: 6px;
+}
+
+/* PRICING MOBILE */
+
+@media (max-width: 700px) {
+  .pricing-page {
+    padding: 65px 5%;
+  }
+
+  .pricing-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pricing-card {
+    padding: 28px;
+  }
+
+  .pricing-message {
+    padding: 30px 22px;
+  }
+}
