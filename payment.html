@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Payment — Pepper.movie</title>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <header class="header">
+    <a href="index.html" class="logo">Pepper<span>.movie</span></a>
+
+    <nav class="nav">
+      <a href="index.html">Home</a>
+      <a href="pricing.html">Membership</a>
+    </nav>
+  </header>
+
+
+  <main>
+
+    <section class="payment-page">
+
+      <div class="payment-intro">
+        <p class="section-label">PAYMENT</p>
+
+        <h1>Complete your payment.</h1>
+
+        <p>
+          Pay with USDT on the TRC20 network,
+          then submit your transaction details for confirmation.
+        </p>
+      </div>
+
+
+      <div class="payment-box">
+
+        <div class="selected-plan">
+          <span>SELECTED PLAN</span>
+          <strong id="selectedPlan">Monthly — $5</strong>
+        </div>
+
+
+        <div class="wallet-box">
+
+          <p class="wallet-label">USDT TRC20 WALLET</p>
+
+          <div class="wallet-address" id="walletAddress">
+            YOUR_USDT_TRC20_WALLET
+          </div>
+
+          <button type="button" onclick="copyWallet()">
+            Copy Wallet Address
+          </button>
+
+          <p class="network-warning">
+            Send USDT only through the TRC20 network.
+          </p>
+
+        </div>
+
+
+        <form class="payment-form">
+
+          <label for="email">Your Email</label>
+
+          <input
+            type="email"
+            id="email"
+            placeholder="you@example.com"
+            required
+          >
+
+
+          <label for="txid">Transaction ID (TXID)</label>
+
+          <input
+            type="text"
+            id="txid"
+            placeholder="Enter your transaction ID"
+            required
+          >
+
+
+          <label for="screenshot">Payment Screenshot</label>
+
+          <input
+            type="file"
+            id="screenshot"
+            accept="image/*"
+            required
+          >
+
+
+          <button type="submit" class="primary-button payment-submit">
+            Submit Payment
+          </button>
+
+        </form>
+
+
+        <div class="payment-status" id="paymentStatus">
+          After submitting, your payment will be manually reviewed.
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <footer class="footer">
+
+    <div class="footer-logo">
+      Pepper<span>.movie</span>
+    </div>
+
+    <p>
+      A growing video library. New content every month.
+    </p>
+
+    <p class="copyright">
+      © 2026 Pepper.movie. All rights reserved.
+    </p>
+
+  </footer>
+
+
+  <script src="app.js"></script>
+
+</body>
+</html>
