@@ -1,109 +1,247 @@
-// Pepper.movie
-// Basic website interactions
+// ==========================================
+// Pepper.movie - Supabase connection
+// ==========================================
 
-document.addEventListener("DOMContentLoaded", function () {
+const SUPABASE_URL = "https://vpmmyiejcfuipwzjsqlu.supabase.co";
+const SUPABASE_KEY = "sb_publishable_xLa7CWBw-sGizqb9oHy5Mg_QDLytX_h";
 
-  // -----------------------------
-  // SELECTED PLAN
-  // -----------------------------
 
-  const selectedPlan = document.getElementById("selectedPlan");
+// Load Supabase library
+const supabaseScript = document.createElement("script");
 
-  if (selectedPlan) {
+supabaseScript.src =
+  "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
 
-    const params = new URLSearchParams(window.location.search);
-    const plan = params.get("plan");
+supabaseScript.onload = function () {
 
-    if (plan === "yearly") {
-      selectedPlan.textContent = "Yearly — $40";
-    } else {
-      selectedPlan.textContent = "Monthly — $5";
-    }
+  window.supabaseClient =
+    window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_KEY
+    );
+
+  console.log("Supabase connected successfully.");
+
+  setupAuth();
+  setupPayment();
+  setupWallet();
+
+};
+
+
+// Add Supabase library to page
+document.head.appendChild(supabaseScript);
+
+
+// ==========================================
+// AUTH
+// ==========================================
+
+function setupAuth() {
+
+  const signUpBtn =
+    document.getElementById("signUpBtn");
+
+  const signInBtn =
+    document.getElementById("signInBtn");
+
+
+  // SIGN UP
+  if (signUpBtn) {
+
+    signUpBtn.addEventListener("click", async function (event) {
+
+      event.preventDefault();
+
+      const email =
+        prompt("Enter your email:");
+
+      if (!email) return;
+
+
+      const password =
+        prompt("Create a password (minimum 6 characters):");
+
+      if (!password) return;
+
+
+      const { data, error } =
+        await window.supabaseClient.auth.signUp({
+          email: email,
+          password: password
+        });
+
+
+      if (error) {
+
+        alert(error.message);
+        return;
+
+      }
+
+
+      alert(
+        "Account created. Check your email to confirm your account."
+      );
+
+    });
+
   }
 
 
-  // -----------------------------
-  // COPY WALLET ADDRESS
-  // -----------------------------
+  // SIGN IN
+  if (signInBtn) {
+
+    signInBtn.addEventListener("click", async function (event) {
+
+      event.preventDefault();
+
+      const email =
+        prompt("Enter your email:");
+
+      if (!email) return;
+
+
+      const password =
+        prompt("Enter your password:");
+
+      if (!password) return;
+
+
+      const { data, error } =
+        await window.supabaseClient.auth.signInWithPassword({
+          email: email,
+          password: password
+        });
+
+
+      if (error) {
+
+        alert(error.message);
+        return;
+
+      }
+
+
+      alert("Login successful.");
+
+      window.location.href = "members.html";
+
+    });
+
+  }
+
+}
+
+
+// ==========================================
+// PAYMENT
+// ==========================================
+
+function setupPayment() {
+
+  const paymentForm =
+    document.querySelector(".payment-form");
+
+  if (!paymentForm) return;
+
+
+  paymentForm.addEventListener("submit", async function (event) {
+
+    event.preventDefault();
+
+
+    const {
+      data: { user }
+    } = await window.supabaseClient.auth.getUser();
+
+
+    if (!user) {
+
+      alert("Please sign in before submitting payment.");
+
+      return;
+
+    }
+
+
+    const email =
+      document.getElementById("email").value.trim();
+
+    const txid =
+      document.getElementById("txid").value.trim();
+
+
+    const params =
+      new URLSearchParams(window.location.search);
+
+    const plan =
+      params.get("plan") === "yearly"
+        ? "yearly"
+        : "monthly";
+
+
+    const amount =
+      plan === "yearly"
+        ? 40
+        : 5;
+
+
+    const { error } =
+      await window.supabaseClient
+        .from("payment_requests")
+        .insert({
+
+          user_id: user.id,
+          plan: plan,
+          amount_usd: amount,
+          network: "TRC20",
+          txid: txid
+
+        });
+
+
+    if (error) {
+
+      alert(error.message);
+      return;
+
+    }
+
+
+    document.getElementById("paymentStatus").textContent =
+      "Payment submitted successfully. Your payment will be manually reviewed.";
+
+
+    paymentForm.reset();
+
+  });
+
+}
+
+
+// ==========================================
+// WALLET
+// ==========================================
+
+function setupWallet() {
 
   window.copyWallet = function () {
 
-    const wallet = document.getElementById("walletAddress");
+    const wallet =
+      document.getElementById("walletAddress");
 
     if (!wallet) return;
 
-    const address = wallet.textContent.trim();
 
-    navigator.clipboard.writeText(address)
+    navigator.clipboard
+      .writeText(wallet.textContent.trim())
       .then(function () {
 
         alert("Wallet address copied.");
 
-      })
-      .catch(function () {
-
-        alert("Copy failed. Please copy the address manually.");
-
       });
+
   };
 
-
-  // -----------------------------
-  // PAYMENT FORM
-  // -----------------------------
-
-  const paymentForm = document.querySelector(".payment-form");
-
-  if (paymentForm) {
-
-    paymentForm.addEventListener("submit", function (event) {
-
-      event.preventDefault();
-
-      const email = document.getElementById("email");
-      const txid = document.getElementById("txid");
-      const screenshot = document.getElementById("screenshot");
-      const status = document.getElementById("paymentStatus");
-
-      if (!email.value || !txid.value || !screenshot.files.length) {
-        alert("Please complete all payment fields.");
-        return;
-      }
-
-      status.textContent =
-        "Payment submitted. Your transaction will be manually reviewed.";
-
-      status.style.color = "#c52a4a";
-
-      paymentForm.reset();
-
-    });
-  }
-
-
-  // -----------------------------
-  // MEMBER VIDEO BUTTONS
-  // -----------------------------
-
-  const memberButtons =
-    document.querySelectorAll(".member-play");
-
-  memberButtons.forEach(function (button) {
-
-    button.addEventListener("click", function (event) {
-
-      const href = button.getAttribute("href");
-
-      if (!href || href === "#") {
-        event.preventDefault();
-
-        alert(
-          "This video will be available after the video link is added."
-        );
-      }
-
-    });
-
-  });
-
-});
+}
