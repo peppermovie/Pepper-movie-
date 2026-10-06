@@ -150,18 +150,14 @@ function setupPayment() {
 
     event.preventDefault();
 
-
     const {
       data: { user }
     } = await window.supabaseClient.auth.getUser();
 
 
     if (!user) {
-
       alert("Please sign in before submitting payment.");
-
       return;
-
     }
 
 
@@ -170,6 +166,15 @@ function setupPayment() {
 
     const txid =
       document.getElementById("txid").value.trim();
+
+    const screenshot =
+      document.getElementById("screenshot").files[0];
+
+
+    if (!email || !txid || !screenshot) {
+      alert("Please complete all payment fields.");
+      return;
+    }
 
 
     const params =
@@ -180,14 +185,35 @@ function setupPayment() {
         ? "yearly"
         : "monthly";
 
-
     const amount =
       plan === "yearly"
         ? 40
         : 5;
 
 
-    const { error } =
+    // Create a unique file name
+    const fileName =
+      user.id + "/" +
+      crypto.randomUUID() + "-" +
+      screenshot.name;
+
+
+    // Upload screenshot
+    const { error: uploadError } =
+      await window.supabaseClient
+        .storage
+        .from("payment-screenshots")
+        .upload(fileName, screenshot);
+
+
+    if (uploadError) {
+      alert("Screenshot upload failed: " + uploadError.message);
+      return;
+    }
+
+
+    // Save payment request
+    const { error: paymentError } =
       await window.supabaseClient
         .from("payment_requests")
         .insert({
@@ -196,16 +222,16 @@ function setupPayment() {
           plan: plan,
           amount_usd: amount,
           network: "TRC20",
-          txid: txid
+          txid: txid,
+          screenshot_path: fileName,
+          status: "pending"
 
         });
 
 
-    if (error) {
-
-      alert(error.message);
+    if (paymentError) {
+      alert("Payment request failed: " + paymentError.message);
       return;
-
     }
 
 
