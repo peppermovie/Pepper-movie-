@@ -25,7 +25,7 @@ supabaseScript.onload = function () {
   setupAuth();
   setupPayment();
   setupWallet();
-
+  checkMembership();
 };
 
 
@@ -133,7 +133,55 @@ function setupAuth() {
 
 }
 
+async function checkMembership() {
+  const message = document.getElementById("memberMessage");
+  const videos = document.getElementById("memberVideos");
 
+  if (!message || !videos) return;
+
+  const { data: { user } } = await window.supabaseClient.auth.getUser();
+
+  if (!user) {
+    message.textContent = "Please sign in to access member videos.";
+    videos.style.display = "none";
+    return;
+  }
+
+  const { data, error } = await window.supabaseClient
+    .from("memberships")
+    .select("status, expires_at")
+    .eq("user_id", user.id)
+    .eq("status", "active")
+    .order("expires_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) {
+    console.error(error);
+    message.textContent = "Could not check membership.";
+    videos.style.display = "none";
+    return;
+  }
+
+  if (!data) {
+    message.textContent = "You don't have an active membership yet.";
+    videos.style.display = "none";
+    return;
+  }
+
+  const expiresAt = new Date(data.expires_at);
+
+  if (expiresAt <= new Date()) {
+    message.textContent = "Your membership has expired.";
+    videos.style.display = "none";
+    return;
+  }
+
+  message.textContent =
+    "Membership active until " + expiresAt.toLocaleDateString();
+
+  videos.style.display = "grid";
+}
 // ==========================================
 // PAYMENT
 // ==========================================
