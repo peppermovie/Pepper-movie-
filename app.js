@@ -26,6 +26,7 @@ supabaseScript.onload = function () {
   setupPayment();
   setupWallet();
   checkMembership();
+  setupAdmin();
 };
 
 
@@ -318,4 +319,44 @@ function setupWallet() {
 
   };
 
+}
+async function setupAdmin() {
+  const container = document.getElementById("paymentRequests");
+  if (!container) return;
+
+  const { data: { user } } = await window.supabaseClient.auth.getUser();
+
+  if (!user) {
+    document.getElementById("adminMessage").textContent =
+      "Please sign in first.";
+    return;
+  }
+
+  const { data, error } = await window.supabaseClient
+    .from("payment_requests")
+    .select("id, user_id, plan, amount_usd, network, txid, status, created_at")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error(error);
+    document.getElementById("adminMessage").textContent =
+      "Could not load payment requests.";
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    container.innerHTML = "<p>No payment requests found.</p>";
+    return;
+  }
+
+  container.innerHTML = data.map(payment => `
+    <div class="payment-request">
+      <p><strong>Plan:</strong> ${payment.plan}</p>
+      <p><strong>Amount:</strong> $${payment.amount_usd}</p>
+      <p><strong>Network:</strong> ${payment.network}</p>
+      <p><strong>TXID:</strong> ${payment.txid}</p>
+      <p><strong>Status:</strong> ${payment.status}</p>
+      <p><strong>Date:</strong> ${new Date(payment.created_at).toLocaleString()}</p>
+    </div>
+  `).join("");
 }
